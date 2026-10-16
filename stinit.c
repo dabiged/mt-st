@@ -220,6 +220,10 @@ static int next_block(FILE *dbf, char *buf, size_t buflen, int limiter)
         bp = buf + len;
         if ((cp = strchr(lbuf, limiter)) != NULL) {
             *cp = '\0';
+            if (len + strlen(lbuf) >= buflen) {
+                fprintf(stderr, "Too long definition: '%s'\n", buf);
+                return FALSE;
+            }
             strcpy(bp, lbuf);
             cp++;
             SKIP_WHITE(cp);
