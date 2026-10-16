@@ -653,9 +653,10 @@ static int find_devfiles(int tapeno, char **names)
             /* Ignore non-tape devices to avoid loading all the modules */
             if (dvp->selective_scan && !accept_tape_name(dent->d_name))
                 continue;
-            strcpy(tmpname, dn);
-            strcat(tmpname, "/");
-            strcat(tmpname, dent->d_name);
+            if (snprintf(tmpname, PATH_MAX, "%s/%s", dn, dent->d_name) >= PATH_MAX) {
+                fprintf(stderr, "Path too long: '%s/%s'\n", dn, dent->d_name);
+                continue;
+            }
             if (stat(tmpname, &statbuf) != 0) {
                 fprintf(stderr, "Can't stat '%s'.\n", tmpname);
                 continue;
