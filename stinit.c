@@ -569,9 +569,10 @@ static int tapenum(char *name)
 
             for (; (dent = readdir(dirp)) != NULL;)
                 if (!strcmp(dent->d_name, name)) {
-                    strcpy(tmpname, dn);
-                    strcat(tmpname, "/");
-                    strcat(tmpname, dent->d_name);
+                    if (snprintf(tmpname, PATH_MAX, "%s/%s", dn, dent->d_name) >= PATH_MAX) {
+                        fprintf(stderr, "Path too long: '%s/%s'\n", dn, dent->d_name);
+                        continue;
+                    }
                     if (stat(tmpname, &statbuf) != 0) {
                         fprintf(stderr, "Can't stat '%s'.\n", tmpname);
                         continue;
